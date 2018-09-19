@@ -21,11 +21,15 @@ def submit_article(request):
         payload = jwt.decode(jwt_code, jwt_secret, algorithms=['HS256'])
         user_id = payload.get('id')
         authorized_user = User.objects.get(id=user_id)
-        Article.objects.create(title=request.data.get('title'), content=request.data.get('content'),
+        try:
+            Article.objects.create(title=request.data.get('title'), content=request.data.get('content'),
                                user=authorized_user)
+        except:
+            return Response({"error": "Invalid/Missing credentials"}, status=status.HTTP_400_BAD_REQUEST)
+
         return Response({"created": True}, status=status.HTTP_201_CREATED)
     else:
-        return Response({"error": "No Authorization"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "No Authorization"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST'])
@@ -55,7 +59,10 @@ def delete_article(request):
         jwt_code = jwt_header.split(' ')[1]
         payload = jwt.decode(jwt_code, jwt_secret, algorithms=['HS256'])
         user_id = payload.get('id')
-        article = Article.objects.get(id=request.data.get('id'))
+        try:
+            article = Article.objects.get(id=request.data.get('id'))
+        except:
+            return Response({"error": "Missing/Invalid Credentials"}, status=status.HTTP_400_BAD_REQUEST)
         if user_id == article.user.id:
             article.delete()
             return Response({"message": "It has been deleted successfully"}, status=status.HTTP_200_OK)
