@@ -13,7 +13,7 @@ gunicorn==19.9.0
 idna==2.7
 psycopg2==2.7.5
 pycparser==2.18
-PyJWT==1.6.4
+PyJWT==2.4.0
 python-decouple==3.1
 pytz==2018.5
 six==1.11.0
